@@ -1,0 +1,1 @@
+Executar os cinco scripts funcionais a partir da raiz PWA, passando index.html. pwa-tests-original-workspace.cjs conserva os caminhos do ambiente original para auditoria; seus resultados acompanham o pacote. Os testes exigem Node e @napi-rs/canvas. São ferramentas de QA, não assets carregados pelo aplicativo.

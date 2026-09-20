@@ -1,0 +1,63 @@
+{
+  "target": "rc1/escalas-app-cbsi-v11-2-6-rc1.html",
+  "passed": 14,
+  "total": 14,
+  "results": [
+    {
+      "name": "Diagnóstico isola meta \"{bad\"",
+      "ok": true
+    },
+    {
+      "name": "Diagnóstico isola meta \"null\"",
+      "ok": true
+    },
+    {
+      "name": "Diagnóstico isola meta \"[]\"",
+      "ok": true
+    },
+    {
+      "name": "Diagnóstico isola meta \"42\"",
+      "ok": true
+    },
+    {
+      "name": "Diagnóstico isola meta \"\\\"dark\\\"\"",
+      "ok": true
+    },
+    {
+      "name": "Diagnóstico isola meta \"\"",
+      "ok": true
+    },
+    {
+      "name": "Meta ausente não é falha",
+      "ok": true
+    },
+    {
+      "name": "Meta válido preserva datas no diagnóstico",
+      "ok": true
+    },
+    {
+      "name": "Meta inválido já conhecido não duplica mensagem",
+      "ok": true
+    },
+    {
+      "name": "Falha de acesso real: diagnóstico informa sem mutação; storageGet aplica fallback",
+      "ok": true
+    },
+    {
+      "name": "Tema legado continua local dark",
+      "ok": true
+    },
+    {
+      "name": "Tema legado continua local light",
+      "ok": true
+    },
+    {
+      "name": "Handler real de exclusão orienta arquivamento e preserva histórico",
+      "ok": true
+    },
+    {
+      "name": "Nenhuma mensagem genérica nega arquivamento disponível",
+      "ok": true
+    }
+  ]
+}

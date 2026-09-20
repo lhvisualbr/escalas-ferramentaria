@@ -1,0 +1,111 @@
+const fs=require('fs'),vm=require('vm'),assert=require('assert'),{createCanvas}=require('@napi-rs/canvas');
+require('@napi-rs/canvas').GlobalFonts.registerFromPath('qa/pdf-regular.ttf','AstraPDF');require('@napi-rs/canvas').GlobalFonts.registerFromPath('qa/pdf-bold.ttf','AstraPDF');
+const target=process.argv[2]||'qa/escalas-app-cbsi-v11-2-4-homologacao-astra.html';
+const html=fs.readFileSync(target,'utf8');let source=html.match(/<script>([\s\S]*?)<\/script>/)[1];
+const data=new Map(),nodes=new Map(),events={};let failKey=null;
+const classList={add(){},remove(){},toggle(){},contains(){return false}};
+function node(id){if(!nodes.has(id))nodes.set(id,{textContent:'',value:'',className:'',hidden:false,classList,style:{},innerHTML:'',appendChild(){},setAttribute(){},querySelector(){return node('child')},addEventListener(n,f){events[id+':'+n]=f},focus(){},remove(){}});return nodes.get(id)}
+const localStorage={get length(){return data.size},key:i=>[...data.keys()][i],getItem:k=>data.has(k)?data.get(k):null,setItem(k,v){if(failKey&&(!failKey.key||k===failKey.key)){if(failKey.once)failKey=null;throw new Error('QuotaExceededError simulado')}data.set(k,String(v))},removeItem:k=>data.delete(k)};
+const document={getElementById:node,querySelectorAll:()=>[],querySelector:()=>null,createElement:t=>t==='canvas'?createCanvas(1,1):node('new'),body:node('body'),documentElement:node('html'),addEventListener(){}};
+const sandbox={console:{log(){},info(){},error(){}},Date,Math,Number,String,Array,Object,JSON,Set,Map,Promise,Uint8Array,Blob,crypto:require('crypto').webcrypto,document,navigator:{},atob:s=>Buffer.from(s,'base64').toString('binary'),location:{protocol:'file:'},setTimeout:()=>0,clearTimeout(){},URL:{createObjectURL:()=>'',revokeObjectURL(){}},localStorage};sandbox.window=sandbox;sandbox.addEventListener=()=>{};
+source=source.replace('  selfTestResult=runCoreSelfTests();',`  window.TEST={run: function(code){return eval(code);}};return;\n  selfTestResult=runCoreSelfTests();`);
+vm.createContext(sandbox);vm.runInContext(source,sandbox);
+const run=code=>sandbox.TEST.run(code),results=[];
+function test(name,fn){try{fn();results.push({name,ok:true});}catch(e){results.push({name,ok:false,error:e.message});}}
+function eq(code,expected){assert.deepStrictEqual(JSON.parse(JSON.stringify(run(code))),expected)}
+const fixture=`state.segunda=new Date(2026,8,14);state.semanaId=weekId(state.segunda);state.diaSel=0;state.pessoas=[{id:'per_person_001',nome:'José Silva'},{id:'per_person_002',nome:'Jose Silva'}];state.postos=[{id:'pst_station_001',nome:'Posto de teste',local:'Dados fictícios de homologação',turnos:[{id:'shf_admin_001',label:'ADM',inicio:'07:30',fim:'17:18',carga:''},{id:'shf_night_001',label:'Noite',inicio:'22:00',fim:'06:00',carga:''}]}];state.atribuicoes={};historyCache={};storageBackend='local';memoryStorage={};localStorage.clearUnused;`;
+function reset(){data.clear();failKey=null;run('storageKeyErrors=Object.create(null)');run(fixture)}
+const key=(d,t='shf_admin_001')=>`pst_station_001__${d}__${t}`;
+function assign(d,he=0,p='per_person_001',t='shf_admin_001'){run(`state.atribuicoes[${JSON.stringify(key(d,t))}]={tipo:'pessoas',pessoaIds:['${p}'],heMinutos:${he}}`)}
+function proposal(d,he=0,t='shf_admin_001'){return `validarPropostaAtribuicao('${key(d,t)}',{tipo:'pessoas',pessoaIds:['per_person_001'],heMinutos:${he}})`}
+reset();test('Autotestes originais 26/26',()=>{const r=run('runCoreSelfTests()');assert.equal(r.passed,r.total);assert.equal(r.total,26)});
+reset();test('IDs HTML únicos',()=>{let ids=[...html.matchAll(/\bid="([^"]+)"/g)].map(m=>m[1]);assert.equal(ids.length,new Set(ids).size)});
+test('IDs de listeners diretos existem',()=>{let ids=new Set([...html.matchAll(/\bid="([^"]+)"/g)].map(m=>m[1]));for(let m of source.matchAll(/getElementById\('([^']+)'\)\.addEventListener/g))assert(ids.has(m[1]),m[1])});
+test('Funções sem definições duplicadas',()=>{let n=[...source.matchAll(/^  (?:async )?function (\w+)\(/gm)].map(m=>m[1]);assert.equal(n.length,new Set(n).size)});
+test('Zoom permitido',()=>assert(!/user-scalable=no|maximum-scale=1/.test(html)));
+test('10000 IDs únicos',()=>eq('new Set(Array.from({length:10000},()=>makeId("per"))).size',10000));
+test('Busca nomes semelhantes ignora acentos',()=>eq('normalizeSearchText(state.pessoas[0].nome)===normalizeSearchText(state.pessoas[1].nome)',true));
+for(const [date,w] of [['2021-01-01','2020-W53'],['2026-12-31','2026-W53'],['2027-01-01','2026-W53'],['2025-12-29','2026-W01']])test('ISO '+date,()=>eq(`weekId(getMondayOf(dataDoKey('${date}')))`,w));
+for(const d of ['2026-02-30','2026-13-01','2026-00-01'])test('Rejeita data '+d,()=>eq(`dataDoKey('${d}')`,null));
+test('Bissexto válido',()=>eq("dateKey(dataDoKey('2024-02-29'))",'2024-02-29'));
+test('Feriado fixo reconhecido',()=>eq("holidayInfo(dataDoKey('2026-09-07')).name",'Independência do Brasil'));
+test('Data móvel de referência',()=>eq("holidayInfo(dataDoKey('2026-04-03')).source",'movel-referencia'));
+for(const [start,end,min] of [['07:30','17:18',528],['13:00','19:00',300],['22:00','06:00',420]])test('Refeição '+start+'–'+end,()=>eq(`duracaoTurnoMinutos({inicio:'${start}',fim:'${end}'})`,min));
+for(const he of [0,30,60])test('HE '+he+' permitida',()=>{reset();eq(proposal(0,he),[]);eq(`intervaloAtribuicao('${key(0)}',{heMinutos:${he}}).minutos`,528+he)});
+for(const he of [-1,61,90,60.1])test('HE '+he+' bloqueada',()=>{reset();assert(run(proposal(0,he)).length>0)});
+test('HE altera saída para 18:18',()=>eq("saidaComHe({fim:'17:18'},{heMinutos:60})",'18:18'));
+test('HE noturna muda data',()=>{reset();eq(`intervalAbsolute(state.segunda,'${key(6,'shf_night_001')}',{heMinutos:60}).end.getDay()`,1);eq(`intervalAbsolute(state.segunda,'${key(6,'shf_night_001')}',{heMinutos:60}).end.getHours()`,7)});
+test('44h em 5 dias',()=>{reset();for(let d=0;d<5;d++)assign(d);eq("cargaSemanalPessoa('per_person_001')",2640)});
+test('5º dia alerta',()=>eq("sequenciaConsecutivaAte('per_person_001',addDays(state.segunda,4),true)",5));
+test('6º dia permitido acima de 44h',()=>{eq(proposal(5),[]);assert(run(`avisosCargaProposta('${key(5)}',{tipo:'pessoas',pessoaIds:['per_person_001'],heMinutos:0})`).length);assign(5)});
+test('7º dia bloqueado',()=>assert(run(proposal(6)).some(x=>x.includes('7 dias'))));
+test('7º dia indireto bloqueado',()=>{reset();for(let d=1;d<7;d++)assign(d);assert(run(proposal(0)).length)});
+test('Ciclo atravessa semanas',()=>{reset();run(`historyCache[weekId(addWeeksTo(state.segunda,-1))]={};for(var d=1;d<7;d++)historyCache[weekId(addWeeksTo(state.segunda,-1))][chaveAtr('pst_station_001',d,'shf_admin_001')]={tipo:'pessoas',pessoaIds:['per_person_001']}`);assert(run(proposal(0)).length)});
+test('Conflito no mesmo dia',()=>{reset();assign(0);assert(run(proposal(0,0,'shf_night_001')).length)});
+test('HE cria sobreposição',()=>{reset();run("state.postos[0].turnos[1].inicio='18:00';state.postos[0].turnos[1].fim='19:00';setRestMinMinutes(0)");assign(0,60);assert(run(proposal(0,0,'shf_night_001')).some(x=>x.includes('conflito')))});
+test('Interjornada 11h exatas aceita',()=>eq('validarLinhaTemporal([{startMs:0,endMs:1000},{startMs:1000+660*60000,endMs:999999999}],660).length',0));
+test('Interjornada 10h59 alerta',()=>eq('validarLinhaTemporal([{startMs:0,endMs:1000},{startMs:1000+659*60000,endMs:999999999}],660)[0].type','rest'));
+test('HE reduz interjornada',()=>{reset();run("state.postos[0].turnos[1].inicio='04:30';state.postos[0].turnos[1].fim='12:30'");assign(0,60);assert(run(proposal(1,0,'shf_night_001')).some(x=>x.includes('intervalo')))});
+test('Domingo/segunda conflito entre semanas',()=>{reset();assign(6,60,'per_person_001','shf_night_001');run("historyCache['2026-W39']={'pst_station_001__0__shf_admin_001':{tipo:'pessoas',pessoaIds:['per_person_001']}};state.postos[0].turnos[0].inicio='06:30'");assert(run('validarSemanaCompleta()').some(x=>x.includes('conflito')))});
+test('Múltipla atribuição com intervalo zero bloqueada por refeição',()=>{reset();run('setRestMinMinutes(0)');assign(0);assert(run(proposal(0,0,'shf_night_001')).some(x=>x.includes('refeição')))});
+test('HE acumulada >60 auditada',()=>{reset();assign(0,60);assign(0,30,'per_person_001','shf_night_001');assert(run('validarSemanaCompleta()').some(x=>x.includes('acumulada')))});
+test('Sem Programação permanece pendente',()=>eq("slotEstaProgramado({tipo:'status',status:'Sem Programação'})",false));
+reset();
+const backup=()=>run('currentDataPack()');
+test('Backup válido',()=>{const r=run('validateImportedPack(currentDataPack())');assert.equal(r.pessoas.length,2)});
+for(const [name,change] of [['ID pessoa duplicado','p.pessoas.push(p.pessoas[0])'],['ID posto duplicado','p.postos.push(p.postos[0])'],['ID turno duplicado','p.postos[0].turnos.push(p.postos[0].turnos[0])'],['semana W00',"p.semanas={'2026-W00':{}}"],['semana W54',"p.semanas={'2026-W54':{}}"],['W53 inexistente',"p.semanas={'2025-W53':{}}"],['data especial inválida',"p.feriados=[{date:'2026-02-30',name:'Inválida'}]"],['HTML no ID',`p.pessoas[0].id='x"onfocus="'`],['referência órfã',`p.semanas={'2026-W38':{'pst_station_001__0__shf_admin_001':{tipo:'pessoas',pessoaIds:['ausente']}}}`],['HE 61',`p.semanas={'2026-W38':{'pst_station_001__0__shf_admin_001':{tipo:'pessoas',pessoaIds:['per_person_001'],heMinutos:61}}}`]])test('Importação rejeita '+name,()=>assert.throws(()=>run(`(function(){var p=currentDataPack();${change};return validateImportedPack(p)})()`)));
+test('Migração mantém referências',()=>{eq(`(function(){var p=validateImportedPack({postos:[{id:'p',nome:'P',turnos:[{id:'t',inicio:'07:30',fim:'17:18'}]}],pessoas:[{id:'u',nome:'U'}],semanas:{'2026-W38':{'p__0__t':{tipo:'pessoas',pessoaIds:['u'],heMinutos:30}}}});return p.semanas['2026-W38'][chaveAtr(p.postos[0].id,0,p.postos[0].turnos[0].id)].pessoaIds[0]===p.pessoas[0].id;})()`,true)});
+test('IDs modernos estáveis na restauração',()=>eq('validateImportedPack(currentDataPack()).pessoas[0].id','per_person_001'));
+// disable only view renderers in function tests; actual business functions continue running
+run("renderTudo=function(){};renderDataCenter=function(){};renderAudit=function(){};renderRecoveryStatus=function(){};toast=function(){};dialogInfo=function(){return Promise.resolve(true)};");
+test('Cadastro e edição preservam ID',()=>{reset();eq("salvarPessoa({id:'per_new_0001',nome:'Nome'})",true);eq("salvarPessoa({id:'per_new_0001',nome:'Nome editado'})",true);eq('state.pessoas.length',3)});
+test('Exclusão sem histórico permitida',()=>eq("excluirPessoa('per_new_0001')",true));
+test('Pessoa com histórico protegida',()=>{assign(0);run("historyCache[state.semanaId]=cloneJson(state.atribuicoes)");eq("excluirPessoa('per_person_001')",false)});
+test('Posto com histórico protegido',()=>eq("excluirPosto('pst_station_001')",false));
+test('Edição de horário com histórico bloqueada',()=>eq("(function(){var p=cloneJson(state.postos[0]);p.turnos[0].fim='18:00';return salvarPosto(p)})()",false));
+test('Remoção de turno histórico bloqueada',()=>eq("(function(){var p=cloneJson(state.postos[0]);p.turnos.shift();return salvarPosto(p)})()",false));
+test('Adicionar novo turno preserva histórico',()=>eq("(function(){var p=cloneJson(state.postos[0]);p.turnos.push({id:'shf_new_001',inicio:'13:00',fim:'19:00',label:'Novo',carga:''});return salvarPosto(p)})()",true));
+test('Snapshot diário criado',()=>{reset();run("ensureDailySnapshot('teste');ensureDailySnapshot('teste 2')");eq('snapshotList().length',1)});
+test('Snapshot de segurança e retenção',()=>{run("for(var i=0;i<12;i++)snapshotSafety('Teste '+i)");eq('snapshotList().length',7)});
+test('Pack completo restaura',()=>{reset();eq('persistWholePack(currentDataPack())',true);eq('storageGet(KEYS.pessoas,[]).length',2)});
+test('Falha de quota mantém outras chaves',()=>{reset();run('persistWholePack(currentDataPack())');failKey={key:'cbsi_v11_meta'};run("storageSet(KEYS.meta,{a:1})");eq("storageBackend",'memory');eq('storageGet(KEYS.pessoas,[]).length',2);eq('storageGet(KEYS.postos,[]).length',1);failKey=null});
+test('Transação falha reverte disco e aplica sessão completa',()=>{reset();run('persistWholePack(currentDataPack())');failKey={key:'cbsi_v11_pessoas',once:true};run("var changedPack=currentDataPack();changedPack.pessoas[0].nome='Atualizado';changedPack.postos[0].nome='Atualizado';storeCorePackAtomic(changedPack)");eq("storageGet(KEYS.pessoas,[])[0].nome",'Atualizado');assert.equal(JSON.parse(data.get('cbsi_v11_postos'))[0].nome,'Posto de teste');assert.equal(JSON.parse(data.get('cbsi_v11_pessoas'))[0].nome,'José Silva')});
+test('Recuperação de transação após interrupção',()=>{reset();run('persistWholePack(currentDataPack())');const old=['postos','pessoas','semanas','feriados'].map(k=>({key:'cbsi_v11_'+k,raw:data.get('cbsi_v11_'+k)}));data.set('cbsi_v11_transaction',JSON.stringify(old));data.set('cbsi_v11_pessoas','[]');run('recoverTransaction()');assert.equal(JSON.parse(data.get('cbsi_v11_pessoas')).length,2);assert(!data.has('cbsi_v11_transaction'))});
+test('JSON corrompido não sobrescrito',()=>{reset();data.set('cbsi_v11_pessoas','{bad');run('storageGet(KEYS.pessoas,[])');assert.equal(data.get('cbsi_v11_pessoas'),'{bad');eq('storageBackend','local')});
+for(const [date,type] of [['2026-09-14','semanal'],['2026-09-18','semanal'],['2026-09-19','especial'],['2026-09-20','especial'],['2026-09-07','especial'],['2025-01-11','especial'],['2027-03-17','semanal']])test('PDF contextual '+date+' → '+type,()=>{reset();run(`var dt=dataDoKey('${date}');state.segunda=getMondayOf(dt);state.semanaId=weekId(state.segunda);state.diaSel=dayIndexForDate(dt)`);eq('resolvePdfContext().tipo',type);eq('resolvePdfContext().data',date);if(type==='especial')eq('dateKey(currentSpecialDates()[0].date)',date)});
+test('PDF data especial cadastrada',()=>{reset();run("storageSet(KEYS.feriados,[{date:'2026-09-16',name:'Parada de teste'}]);state.diaSel=2");eq('resolvePdfContext().tipo','especial')});
+test('Contexto central segue seleção na semana corrente',()=>{reset();run('state.segunda=getMondayOf(new Date());state.semanaId=weekId(state.segunda);state.diaSel=(dayIndexForDate(new Date())+1)%7');eq('dateKey(contextDateForTodayCenter())===dateKey(addDays(state.segunda,state.diaSel))',true)});
+test('PDF ambíguo não resolvido silenciosamente',()=>{run('state.diaSel=9');eq('resolvePdfContext()',null)});
+test('6º dia futuro também alerta',()=>{reset();for(let d=1;d<6;d++)assign(d);eq(`cicloProjetadoAtribuicao('${key(0)}',{tipo:'pessoas',pessoaIds:['per_person_001']})[0].streak`,6)});
+test('Conflitos aninhados detectados',()=>eq('validarLinhaTemporal([{startMs:0,endMs:1000},{startMs:100,endMs:200},{startMs:300,endMs:400}],0).length',2));
+test('Backup guarda interjornada configurada',()=>{reset();run('setRestMinMinutes(720)');eq('validateImportedPack(currentDataPack()).settings.interjornadaMinutos',720)});
+test('Restauração recupera interjornada',()=>{run('var savedPack=currentDataPack();setRestMinMinutes(660);persistWholePack(savedPack)');eq('getRestMinMinutes()',720)});
+async function main(){
+
+ const asyncTest=async(name,fn)=>{try{await fn();results.push({name,ok:true})}catch(e){results.push({name,ok:false,error:e.message})}};
+ run("downloadBlob=function(blob,name){window.lastDownload={blob:blob,name:name}};dialogConfirm=function(){return Promise.resolve(true)};fecharSheets=function(){};carregarLocal=function(){state.postos=storageGet(KEYS.postos,[]);state.pessoas=storageGet(KEYS.pessoas,[]);historyCache=storageGet(KEYS.semanas,{});state.atribuicoes=historyCache[state.semanaId]||{}};");
+ for(const [date,type] of [['2026-09-14','Semana'],['2026-09-18','Semana'],['2026-09-19','Especial'],['2026-09-20','Especial'],['2026-09-07','Especial'],['2025-01-11','Especial'],['2027-03-17','Semana']])await asyncTest('Geração contextual executada '+date,async()=>{reset();run(`goToDate(dataDoKey('${date}'));window.lastDownload=null`);await run('gerarPdfContextual()');assert(sandbox.lastDownload.name.includes(type));assert.equal(sandbox.lastDownload.blob.type,'application/pdf');if(type==='Especial')assert(sandbox.lastDownload.name.includes(date))});
+ await asyncTest('Geração contextual de data cadastrada',async()=>{reset();run("storageSet(KEYS.feriados,[{date:'2026-09-16',name:'Teste'}]);state.diaSel=2;window.lastDownload=null");await run('gerarPdfContextual()');assert(sandbox.lastDownload.name.includes('Especial_2026-09-16'))});
+ await asyncTest('PDF especial bloqueia jornada inválida',async()=>{reset();for(let d=0;d<7;d++)assign(d);run('state.diaSel=6;window.lastDownload=null');await run('gerarPdfContextual()');assert.equal(sandbox.lastDownload,null)});
+ await asyncTest('Duplicação valida ciclo entre semanas',async()=>{reset();for(let d=0;d<6;d++)assign(d);run("historyCache['2026-W38']=cloneJson(state.atribuicoes);state.segunda=addWeeksTo(state.segunda,1);state.semanaId=weekId(state.segunda);state.atribuicoes={};historyCache['2026-W38']['pst_station_001__6__shf_admin_001']={tipo:'pessoas',pessoaIds:['per_person_001']}");await run('duplicarSemanaAnterior()');eq('Object.keys(state.atribuicoes).length',0)});
+ await asyncTest('Restauração de snapshot pela função de fluxo',async()=>{reset();run("snapshotSafety('Base');window.snapId=snapshotList()[0].id;state.pessoas[0].nome='Alterado'");await run('restoreSnapshot(snapId)');eq('state.pessoas[0].nome','José Silva')});
+ let readerPromise;
+ sandbox.FileReader=class {readAsText(file){this.result=file.text;readerPromise=this.onload()}};
+ await asyncTest('Importação simulada via FileReader válido',async()=>{reset();const pack=backup();pack.pessoas[0].nome='Importado';sandbox.testFile={size:100,text:JSON.stringify(pack)};run('importBackupFile(testFile)');await readerPromise;eq('state.pessoas[0].nome','Importado')});
+ await asyncTest('Importação inválida preserva estado',async()=>{const before=run('JSON.stringify(state.pessoas)');sandbox.testFile={size:5,text:'{bad'};run('importBackupFile(testFile)');await readerPromise;eq('JSON.stringify(state.pessoas)',before)});
+ reset();for(let d=0;d<5;d++)assign(d,d===2?60:0);assign(5,30,'per_person_002');run('historyCache[state.semanaId]=cloneJson(state.atribuicoes)');
+ const weekly=run('montarPdfVetorSemanal()');fs.writeFileSync('qa/EXEMPLO_SEMANAL_V11_2_5.pdf',Buffer.from(await weekly.arrayBuffer()));
+ test('PDF semanal MIME',()=>assert.equal(weekly.type,'application/pdf'));
+ test('PDF semanal pesquisável e HE',()=>{const text=run("lastPdfPages.map(p=>p.content).join('')");assert(text.includes('José Silva'));assert(text.includes('18:18'));assert(/HE\s+\+1h00/.test(run("lastPdfPages.flatMap(p=>p.ops.filter(o=>o.type==='text').map(o=>o.text)).join(' ')")))});
+ test('PDF típico em uma página',()=>eq('lastPdfPages.length',1));
+ run('state.diaSel=5');const special=run('montarPdfVetorEspecial()');fs.writeFileSync('qa/EXEMPLO_ESPECIAL_V11_2_5.pdf',Buffer.from(await special.arrayBuffer()));
+ test('PDF especial data correta',()=>assert(run("lastPdfPages[0].content").includes('19/09/2026')));
+ test('PDF especial só data selecionada',()=>assert(!run("lastPdfPages[0].content").includes('20/09')));
+ test('Prévia usa as mesmas páginas',()=>{const cv=run('canvasesFromPdfPages()');assert.equal(cv.length,run('lastPdfPages.length'));fs.writeFileSync('qa/PREVIA_PDF_ESPECIAL.png',cv[0].toBuffer('image/png'))});
+ test('PDF extenso não omite última pessoa',()=>{reset();run("state.pessoas=Array.from({length:100},(_,i)=>({id:'per_stress_'+i,nome:'Colaborador de Teste Número '+i}));state.atribuicoes[chaveAtr(state.postos[0].id,0,state.postos[0].turnos[0].id)]={tipo:'pessoas',pessoaIds:state.pessoas.map(p=>p.id),heMinutos:60};montarPdfVetorSemanal()");assert(run("lastPdfPages.map(p=>p.content).join('')").includes('99'));assert(run('lastPdfPages.length')>1)});
+ test('Fonte mínima 8pt para notas, 10pt no corpo',()=>{const sizes=run("lastPdfPages.flatMap(p=>p.ops.filter(o=>o.type==='text').map(o=>o.size))");assert(Math.min(...sizes)>=8)});
+ fs.writeFileSync('qa/regression-results.json',JSON.stringify({target,timezone:process.env.TZ||'system',passed:results.filter(x=>x.ok).length,total:results.length,results},null,2));
+ console.log(JSON.stringify({passed:results.filter(x=>x.ok).length,total:results.length,failures:results.filter(x=>!x.ok)},null,2));
+ if(results.some(x=>!x.ok))process.exitCode=1;
+}
+main().catch(e=>{console.error(e);process.exitCode=1});

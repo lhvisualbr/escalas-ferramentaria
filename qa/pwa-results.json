@@ -1,0 +1,82 @@
+{
+  "passed": 19,
+  "total": 19,
+  "results": [
+    {
+      "name": "Manifest caminhos relativos e standalone",
+      "ok": true
+    },
+    {
+      "name": "Manifest assets existentes e PNG dimensões declaradas",
+      "ok": true
+    },
+    {
+      "name": "HTML RC idêntico ao index",
+      "ok": true
+    },
+    {
+      "name": "Sem scripts ou CSS remotos obrigatórios",
+      "ok": true
+    },
+    {
+      "name": "Registro restrito a contexto seguro HTTP(S), escopo relativo",
+      "ok": true
+    },
+    {
+      "name": "Manifest HTML referenciado existe",
+      "ok": true
+    },
+    {
+      "name": "Instala shell RC no cache exclusivo e subpasta",
+      "ok": true
+    },
+    {
+      "name": "Instalação rejeita HTML de outra versão sem substituir cache",
+      "ok": true
+    },
+    {
+      "name": "Remove cache antigo próprio, preserva outro app e escopo",
+      "ok": true
+    },
+    {
+      "name": "Online prioriza HTML novo sobre cache",
+      "ok": true
+    },
+    {
+      "name": "Offline usa último shell disponível",
+      "ok": true
+    },
+    {
+      "name": "Raiz e query usam mesmo index offline",
+      "ok": true
+    },
+    {
+      "name": "404 não é escondido por HTML antigo",
+      "ok": true
+    },
+    {
+      "name": "500 usa shell previamente disponível",
+      "ok": true
+    },
+    {
+      "name": "Ignora POST, outras origens, outros escopos e dados",
+      "ok": true
+    },
+    {
+      "name": "Sem localStorage/IndexedDB no worker",
+      "ok": true
+    },
+    {
+      "name": "Sem ativação forçada, reload ou loop",
+      "ok": true
+    },
+    {
+      "name": "Falha de cache não impede resposta online",
+      "ok": true
+    },
+    {
+      "name": "Quota cache não impede resposta online",
+      "ok": true
+    }
+  ]
+}

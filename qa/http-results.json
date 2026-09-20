@@ -1,0 +1,37 @@
+[
+  {
+    "asset": "index.html",
+    "status": 200,
+    "mime": "text/html",
+    "bytes": 552244,
+    "ok": true
+  },
+  {
+    "asset": "manifest.webmanifest",
+    "status": 200,
+    "mime": "application/manifest+json",
+    "bytes": 513,
+    "ok": true
+  },
+  {
+    "asset": "sw.js",
+    "status": 200,
+    "mime": "text/javascript",
+    "bytes": 2628,
+    "ok": true
+  },
+  {
+    "asset": "icons/icon-192.png",
+    "status": 200,
+    "mime": "image/png",
+    "bytes": 684,
+    "ok": true
+  },
+  {
+    "asset": "icons/icon-512.png",
+    "status": 200,
+    "mime": "image/png",
+    "bytes": 2090,
+    "ok": true
+  }
+]

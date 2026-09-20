@@ -1,0 +1,138 @@
+{
+  "passed": 21,
+  "total": 21,
+  "results": [
+    {
+      "name": "Renomear pessoa histórica bloqueado",
+      "ok": true
+    },
+    {
+      "name": "Renomear posto histórico bloqueado",
+      "ok": true
+    },
+    {
+      "name": "Arquivamento preserva histórico e nome",
+      "ok": true
+    },
+    {
+      "name": "Arquivado bloqueado em nova atribuição",
+      "ok": true
+    },
+    {
+      "name": "Arquivado mantém atribuição existente editável",
+      "ok": true
+    },
+    {
+      "name": "Backup preserva arquivamento",
+      "ok": true
+    },
+    {
+      "name": "Edição não remove estado de arquivamento",
+      "ok": true
+    },
+    {
+      "name": "Reativação permite nova atribuição",
+      "ok": true
+    },
+    {
+      "name": "Auditoria registra reativação",
+      "ok": true
+    },
+    {
+      "name": "Arquivo com archive inválido rejeitado",
+      "ok": true
+    },
+    {
+      "name": "Backup freshness null / 0",
+      "ok": true
+    },
+    {
+      "name": "Backup freshness 2026-09-01 / 1788912000000",
+      "ok": true
+    },
+    {
+      "name": "Backup freshness 2026-09-01 / 1788307200000",
+      "ok": true
+    },
+    {
+      "name": "Backup freshness 2026-09-03 / 1788307200000",
+      "ok": true
+    },
+    {
+      "name": "Diagnóstico não escreve nem altera estado",
+      "ok": true
+    },
+    {
+      "name": "Diagnóstico expõe falha estrutural",
+      "ok": true
+    },
+    {
+      "name": "Bloqueio impede storage e transação",
+      "ok": true
+    },
+    {
+      "name": "Remoção limpa espelho de armazenamento",
+      "ok": true
+    },
+    {
+      "name": "Ajuda opcional e diagnóstico recolhidos",
+      "ok": true
+    },
+    {
+      "name": "Segunda aba sem lock não inicializa (simulado)",
+      "ok": true
+    },
+    {
+      "name": "Primeira aba com lock inicializa (simulado)",
+      "ok": true
+    }
+  ],
+  "performance": [
+    {
+      "people": 50,
+      "posts": 20,
+      "weeks": 52,
+      "measurements": [
+        {
+          "name": "search",
+          "ms": 0.11
+        },
+        {
+          "name": "backup serialization",
+          "ms": 4.92
+        },
+        {
+          "name": "weekly PDF",
+          "ms": 21.89
+        },
+        {
+          "name": "validation",
+          "ms": 57.82
+        }
+      ]
+    },
+    {
+      "people": 100,
+      "posts": 20,
+      "weeks": 52,
+      "measurements": [
+        {
+          "name": "search",
+          "ms": 0.14
+        },
+        {
+          "name": "backup serialization",
+          "ms": 4.34
+        },
+        {
+          "name": "weekly PDF",
+          "ms": 21.64
+        },
+        {
+          "name": "validation",
+          "ms": 86.94
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,432 @@
+{
+  "target": "rc1/escalas-app-cbsi-v11-2-6-rc1.html",
+  "timezone": "America/Sao_Paulo",
+  "passed": 106,
+  "total": 106,
+  "results": [
+    {
+      "name": "Autotestes originais 26/26",
+      "ok": true
+    },
+    {
+      "name": "IDs HTML únicos",
+      "ok": true
+    },
+    {
+      "name": "IDs de listeners diretos existem",
+      "ok": true
+    },
+    {
+      "name": "Funções sem definições duplicadas",
+      "ok": true
+    },
+    {
+      "name": "Zoom permitido",
+      "ok": true
+    },
+    {
+      "name": "10000 IDs únicos",
+      "ok": true
+    },
+    {
+      "name": "Busca nomes semelhantes ignora acentos",
+      "ok": true
+    },
+    {
+      "name": "ISO 2021-01-01",
+      "ok": true
+    },
+    {
+      "name": "ISO 2026-12-31",
+      "ok": true
+    },
+    {
+      "name": "ISO 2027-01-01",
+      "ok": true
+    },
+    {
+      "name": "ISO 2025-12-29",
+      "ok": true
+    },
+    {
+      "name": "Rejeita data 2026-02-30",
+      "ok": true
+    },
+    {
+      "name": "Rejeita data 2026-13-01",
+      "ok": true
+    },
+    {
+      "name": "Rejeita data 2026-00-01",
+      "ok": true
+    },
+    {
+      "name": "Bissexto válido",
+      "ok": true
+    },
+    {
+      "name": "Feriado fixo reconhecido",
+      "ok": true
+    },
+    {
+      "name": "Data móvel de referência",
+      "ok": true
+    },
+    {
+      "name": "Refeição 07:30–17:18",
+      "ok": true
+    },
+    {
+      "name": "Refeição 13:00–19:00",
+      "ok": true
+    },
+    {
+      "name": "Refeição 22:00–06:00",
+      "ok": true
+    },
+    {
+      "name": "HE 0 permitida",
+      "ok": true
+    },
+    {
+      "name": "HE 30 permitida",
+      "ok": true
+    },
+    {
+      "name": "HE 60 permitida",
+      "ok": true
+    },
+    {
+      "name": "HE -1 bloqueada",
+      "ok": true
+    },
+    {
+      "name": "HE 61 bloqueada",
+      "ok": true
+    },
+    {
+      "name": "HE 90 bloqueada",
+      "ok": true
+    },
+    {
+      "name": "HE 60.1 bloqueada",
+      "ok": true
+    },
+    {
+      "name": "HE altera saída para 18:18",
+      "ok": true
+    },
+    {
+      "name": "HE noturna muda data",
+      "ok": true
+    },
+    {
+      "name": "44h em 5 dias",
+      "ok": true
+    },
+    {
+      "name": "5º dia alerta",
+      "ok": true
+    },
+    {
+      "name": "6º dia permitido acima de 44h",
+      "ok": true
+    },
+    {
+      "name": "7º dia bloqueado",
+      "ok": true
+    },
+    {
+      "name": "7º dia indireto bloqueado",
+      "ok": true
+    },
+    {
+      "name": "Ciclo atravessa semanas",
+      "ok": true
+    },
+    {
+      "name": "Conflito no mesmo dia",
+      "ok": true
+    },
+    {
+      "name": "HE cria sobreposição",
+      "ok": true
+    },
+    {
+      "name": "Interjornada 11h exatas aceita",
+      "ok": true
+    },
+    {
+      "name": "Interjornada 10h59 alerta",
+      "ok": true
+    },
+    {
+      "name": "HE reduz interjornada",
+      "ok": true
+    },
+    {
+      "name": "Domingo/segunda conflito entre semanas",
+      "ok": true
+    },
+    {
+      "name": "Múltipla atribuição com intervalo zero bloqueada por refeição",
+      "ok": true
+    },
+    {
+      "name": "HE acumulada >60 auditada",
+      "ok": true
+    },
+    {
+      "name": "Sem Programação permanece pendente",
+      "ok": true
+    },
+    {
+      "name": "Backup válido",
+      "ok": true
+    },
+    {
+      "name": "Importação rejeita ID pessoa duplicado",
+      "ok": true
+    },
+    {
+      "name": "Importação rejeita ID posto duplicado",
+      "ok": true
+    },
+    {
+      "name": "Importação rejeita ID turno duplicado",
+      "ok": true
+    },
+    {
+      "name": "Importação rejeita semana W00",
+      "ok": true
+    },
+    {
+      "name": "Importação rejeita semana W54",
+      "ok": true
+    },
+    {
+      "name": "Importação rejeita W53 inexistente",
+      "ok": true
+    },
+    {
+      "name": "Importação rejeita data especial inválida",
+      "ok": true
+    },
+    {
+      "name": "Importação rejeita HTML no ID",
+      "ok": true
+    },
+    {
+      "name": "Importação rejeita referência órfã",
+      "ok": true
+    },
+    {
+      "name": "Importação rejeita HE 61",
+      "ok": true
+    },
+    {
+      "name": "Migração mantém referências",
+      "ok": true
+    },
+    {
+      "name": "IDs modernos estáveis na restauração",
+      "ok": true
+    },
+    {
+      "name": "Cadastro e edição preservam ID",
+      "ok": true
+    },
+    {
+      "name": "Exclusão sem histórico permitida",
+      "ok": true
+    },
+    {
+      "name": "Pessoa com histórico protegida",
+      "ok": true
+    },
+    {
+      "name": "Posto com histórico protegido",
+      "ok": true
+    },
+    {
+      "name": "Edição de horário com histórico bloqueada",
+      "ok": true
+    },
+    {
+      "name": "Remoção de turno histórico bloqueada",
+      "ok": true
+    },
+    {
+      "name": "Adicionar novo turno preserva histórico",
+      "ok": true
+    },
+    {
+      "name": "Snapshot diário criado",
+      "ok": true
+    },
+    {
+      "name": "Snapshot de segurança e retenção",
+      "ok": true
+    },
+    {
+      "name": "Pack completo restaura",
+      "ok": true
+    },
+    {
+      "name": "Falha de quota mantém outras chaves",
+      "ok": true
+    },
+    {
+      "name": "Transação falha reverte disco e aplica sessão completa",
+      "ok": true
+    },
+    {
+      "name": "Recuperação de transação após interrupção",
+      "ok": true
+    },
+    {
+      "name": "JSON corrompido não sobrescrito",
+      "ok": true
+    },
+    {
+      "name": "PDF contextual 2026-09-14 → semanal",
+      "ok": true
+    },
+    {
+      "name": "PDF contextual 2026-09-18 → semanal",
+      "ok": true
+    },
+    {
+      "name": "PDF contextual 2026-09-19 → especial",
+      "ok": true
+    },
+    {
+      "name": "PDF contextual 2026-09-20 → especial",
+      "ok": true
+    },
+    {
+      "name": "PDF contextual 2026-09-07 → especial",
+      "ok": true
+    },
+    {
+      "name": "PDF contextual 2025-01-11 → especial",
+      "ok": true
+    },
+    {
+      "name": "PDF contextual 2027-03-17 → semanal",
+      "ok": true
+    },
+    {
+      "name": "PDF data especial cadastrada",
+      "ok": true
+    },
+    {
+      "name": "Contexto central segue seleção na semana corrente",
+      "ok": true
+    },
+    {
+      "name": "PDF ambíguo não resolvido silenciosamente",
+      "ok": true
+    },
+    {
+      "name": "6º dia futuro também alerta",
+      "ok": true
+    },
+    {
+      "name": "Conflitos aninhados detectados",
+      "ok": true
+    },
+    {
+      "name": "Backup guarda interjornada configurada",
+      "ok": true
+    },
+    {
+      "name": "Restauração recupera interjornada",
+      "ok": true
+    },
+    {
+      "name": "Geração contextual executada 2026-09-14",
+      "ok": true
+    },
+    {
+      "name": "Geração contextual executada 2026-09-18",
+      "ok": true
+    },
+    {
+      "name": "Geração contextual executada 2026-09-19",
+      "ok": true
+    },
+    {
+      "name": "Geração contextual executada 2026-09-20",
+      "ok": true
+    },
+    {
+      "name": "Geração contextual executada 2026-09-07",
+      "ok": true
+    },
+    {
+      "name": "Geração contextual executada 2025-01-11",
+      "ok": true
+    },
+    {
+      "name": "Geração contextual executada 2027-03-17",
+      "ok": true
+    },
+    {
+      "name": "Geração contextual de data cadastrada",
+      "ok": true
+    },
+    {
+      "name": "PDF especial bloqueia jornada inválida",
+      "ok": true
+    },
+    {
+      "name": "Duplicação valida ciclo entre semanas",
+      "ok": true
+    },
+    {
+      "name": "Restauração de snapshot pela função de fluxo",
+      "ok": true
+    },
+    {
+      "name": "Importação simulada via FileReader válido",
+      "ok": true
+    },
+    {
+      "name": "Importação inválida preserva estado",
+      "ok": true
+    },
+    {
+      "name": "PDF semanal MIME",
+      "ok": true
+    },
+    {
+      "name": "PDF semanal pesquisável e HE",
+      "ok": true
+    },
+    {
+      "name": "PDF típico em uma página",
+      "ok": true
+    },
+    {
+      "name": "PDF especial data correta",
+      "ok": true
+    },
+    {
+      "name": "PDF especial só data selecionada",
+      "ok": true
+    },
+    {
+      "name": "Prévia usa as mesmas páginas",
+      "ok": true
+    },
+    {
+      "name": "PDF extenso não omite última pessoa",
+      "ok": true
+    },
+    {
+      "name": "Fonte mínima 8pt para notas, 10pt no corpo",
+      "ok": true
+    }
+  ]
+}

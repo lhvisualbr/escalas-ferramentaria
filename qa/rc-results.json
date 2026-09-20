@@ -1,0 +1,26 @@
+{
+  "passed": 5,
+  "total": 5,
+  "results": [
+    {
+      "name": "Startup simulado sem suporte a SW continua operacional",
+      "ok": true
+    },
+    {
+      "name": "File não registra SW",
+      "ok": true
+    },
+    {
+      "name": "HTTP inseguro não registra SW",
+      "ok": true
+    },
+    {
+      "name": "Registro HTTPS relativo e rejeição não derruba inicialização",
+      "ok": true
+    },
+    {
+      "name": "Duplicação com arquivado bloqueada preserva semana",
+      "ok": true
+    }
+  ]
+}

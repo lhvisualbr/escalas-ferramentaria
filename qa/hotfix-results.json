@@ -1,0 +1,122 @@
+{
+  "passed": 29,
+  "total": 29,
+  "results": [
+    {
+      "name": "cbsi_theme_v11 legado dark",
+      "ok": true
+    },
+    {
+      "name": "cbsi_theme_v11 legado light",
+      "ok": true
+    },
+    {
+      "name": "cbsi_theme_v10 legado dark",
+      "ok": true
+    },
+    {
+      "name": "cbsi_theme_v10 legado light",
+      "ok": true
+    },
+    {
+      "name": "cbsi_theme_v9 legado dark",
+      "ok": true
+    },
+    {
+      "name": "cbsi_theme_v9 legado light",
+      "ok": true
+    },
+    {
+      "name": "Chave inválida isolada não afeta outras",
+      "ok": true
+    },
+    {
+      "name": "JSON de tema atual mantém local",
+      "ok": true
+    },
+    {
+      "name": "Tema inválido preservado e fallback visual seguro",
+      "ok": true
+    },
+    {
+      "name": "Tema com tipo JSON inválido isolado",
+      "ok": true
+    },
+    {
+      "name": "Texto dark não é permitido em chave estruturada",
+      "ok": true
+    },
+    {
+      "name": "Tipo de chave pessoas isolado",
+      "ok": true
+    },
+    {
+      "name": "Tipo de chave postos isolado",
+      "ok": true
+    },
+    {
+      "name": "Tipo de chave semanas isolado",
+      "ok": true
+    },
+    {
+      "name": "Tipo de chave meta isolado",
+      "ok": true
+    },
+    {
+      "name": "Tipo de chave snapshots isolado",
+      "ok": true
+    },
+    {
+      "name": "Espelho mantém última leitura válida",
+      "ok": true
+    },
+    {
+      "name": "Hidratação aceita tema legado sem gravar",
+      "ok": true
+    },
+    {
+      "name": "Leitura não migra na sessão bloqueada",
+      "ok": true
+    },
+    {
+      "name": "Falha real getItem ativa fallback preservando espelho",
+      "ok": true
+    },
+    {
+      "name": "Quota na migração é falha real, preserva tema bruto",
+      "ok": true
+    },
+    {
+      "name": "Diário corrompido não muda backend nem é apagado",
+      "ok": true
+    },
+    {
+      "name": "Diário duplicado rejeitado antes de qualquer gravação",
+      "ok": true
+    },
+    {
+      "name": "Migração automática não substitui chave danificada",
+      "ok": true
+    },
+    {
+      "name": "Restauração validada pode substituir chave danificada",
+      "ok": true
+    },
+    {
+      "name": "Inicialização de dados vazia sem modo temporário",
+      "ok": true
+    },
+    {
+      "name": "Inicialização com tema legado preserva conjunto estruturado",
+      "ok": true
+    },
+    {
+      "name": "BroadcastChannel detecta outra sessão antes de iniciar (simulado)",
+      "ok": true
+    },
+    {
+      "name": "Evento de escrita externa bloqueia persistência (simulado)",
+      "ok": true
+    }
+  ]
+}
